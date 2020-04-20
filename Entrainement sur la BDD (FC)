@@ -1,0 +1,195 @@
+import keras
+from keras.datasets import mnist
+from keras.layers import Dense
+from keras.models import Sequential
+from matplotlib import pyplot as plt
+from random import randint
+import scipy.optimize as so
+import numpy as np
+
+# Preparing the dataset
+# Setup train and test splits
+(x_train, y_train), (x_test, y_test) = mnist.load_data()
+
+# Making a copy before flattening for the next code-segment which displays images
+x_train_drawing = x_train
+
+image_size = 784 # 28 x 28
+x_train = x_train.reshape(x_train.shape[0], image_size) 
+x_test = x_test.reshape(x_test.shape[0], image_size)
+
+# Convert class vectors to binary class matrices
+num_classes = 10
+y_train = keras.utils.to_categorical(y_train, num_classes)
+y_test = keras.utils.to_categorical(y_test, num_classes)
+
+# e,f = x_train[0], x_train[1]
+# x_train[0] = a
+# x_train[1] = c
+
+#I - Sert à voir qqs images
+
+for i in range(64):
+    ax = plt.subplot(8, 8, i+1)
+    ax.axis('off')
+    #plt.imshow(x_train_drawing[randint(0, x_train.shape[0])], cmap='Greys')
+    plt.imshow(x_train_drawing[randint(0, len(x_train))], cmap='Greys')
+    #plt.imshow(b_drawing[randint(0, 2)], cmap='Greys')
+    plt.show()
+
+# x_train[0] = e
+# x_train[1] = f
+
+#II - Premier réseau
+
+def RNN1():
+    model = Sequential()
+    
+    model.add(Dense(units=num_classes, activation='softmax', input_shape=(image_size,) , kernel_regularizer=keras.regularizers.l2(10**(-4)/10)))
+    model.summary()
+    
+    #Entrainer et évaluer le réseau
+    
+    model.compile(optimizer= "SGD", loss='categorical_crossentropy', metrics=['accuracy'])
+    history = model.fit(x_train, y_train, batch_size=128, epochs=50, verbose=False, validation_split=.1)
+    loss, accuracy  = model.evaluate(x_test, y_test, verbose=False)
+    
+    # print("coucou", model.predict_proba(np.array([a,c])))
+    # print("coucou", model.predict_classes(np.array([a,c])))
+    # print("coucou", model.predict_on_batch(x_test))
+    
+    plt.plot(history.history['accuracy'])
+    plt.plot(history.history['val_accuracy'])
+    plt.title('model accuracy')
+    plt.ylabel('accuracy')
+    plt.xlabel('epoch')
+    plt.legend(['training', 'validation'], loc='best')
+    plt.show()
+    
+    print(f'Test loss: {loss:.3}')
+    print(f'Test accuracy: {accuracy:.3}')
+    
+    
+def RNN2():
+    model = Sequential()
+    
+    model.add(Dense(units=num_classes, activation='softmax', input_shape=(image_size,) , kernel_regularizer=keras.regularizers.l2(10**(-2)/10)))
+    model.summary()
+    
+    #Entrainer et évaluer le réseau
+    
+    model.compile(optimizer= "SGD", loss='categorical_crossentropy', metrics=['accuracy'])
+    history = model.fit(x_train, y_train, batch_size=128, epochs=50, verbose=False, validation_split=.1)
+    loss, accuracy  = model.evaluate(x_test, y_test, verbose=False)
+    
+    plt.plot(history.history['accuracy'])
+    plt.plot(history.history['val_accuracy'])
+    plt.title('model accuracy')
+    plt.ylabel('accuracy')
+    plt.xlabel('epoch')
+    plt.legend(['training', 'validation'], loc='best')
+    plt.show()
+    
+    print(f'Test loss: {loss:.3}')
+    print(f'Test accuracy: {accuracy:.3}')
+    
+
+def RNN3():
+    model = Sequential()
+    
+    model.add(Dense(units=num_classes, activation='softmax', input_shape=(image_size,) , kernel_regularizer=keras.regularizers.l2(1/10)))
+    model.summary()
+    
+    #Entrainer et évaluer le réseau
+    
+    model.compile(optimizer= "SGD", loss='categorical_crossentropy', metrics=['accuracy'])
+    history = model.fit(x_train, y_train, batch_size=128, epochs=50, verbose=False, validation_split=.1)
+    loss, accuracy  = model.evaluate(x_test, y_test, verbose=False)
+    
+    plt.plot(history.history['accuracy'])
+    plt.plot(history.history['val_accuracy'])
+    plt.title('model accuracy')
+    plt.ylabel('accuracy')
+    plt.xlabel('epoch')
+    plt.legend(['training', 'validation'], loc='best')
+    plt.show()
+    
+    print(f'Test loss: {loss:.3}')
+    print(f'Test accuracy: {accuracy:.3}')
+    
+
+def RNN4():
+    model = Sequential()
+    
+    # The input layer requires the special input_shape parameter which should match
+    # the shape of our training data.
+    model.add(Dense(units=100, activation='sigmoid', input_shape=(image_size,), kernel_regularizer=keras.regularizers.l2(10**(-5)/100)))
+    model.add(Dense(units=100, activation='sigmoid', kernel_regularizer=keras.regularizers.l2(10**(-5)/100)))
+    model.add(Dense(units=num_classes, activation='softmax', kernel_regularizer=keras.regularizers.l2(10**(-6)/10)))
+    model.summary()
+    
+    #Entrainer et évaluer le réseau
+    
+    model.compile(optimizer= "SGD", loss='categorical_crossentropy', metrics=['accuracy'])
+    history = model.fit(x_train, y_train, batch_size=128, epochs=100, verbose=False, validation_split=.1)
+    loss, accuracy  = model.evaluate(x_test, y_test, verbose=False)
+    
+    #print("coucou", model.predict_proba(np.array([a,c])))
+    #print("coucou", model.predict_classes(np.array([a,c])))
+    #print("coucou", model.predict_on_batch(x_test))
+    
+    plt.plot(history.history['accuracy'])
+    plt.plot(history.history['val_accuracy'])
+    plt.title('model accuracy')
+    plt.ylabel('accuracy')
+    plt.xlabel('epoch')
+    plt.legend(['training', 'validation'], loc='best')
+    plt.show()
+    
+    print(f'Test loss: {loss:.3}')
+    print(f'Test accuracy: {accuracy:.3}')
+
+
+def RNN5():
+    model = Sequential()
+    
+    # The input layer requires the special input_shape parameter which should match
+    # the shape of our training data.
+    model.add(Dense(units=200, activation='sigmoid', input_shape=(image_size,), kernel_regularizer=keras.regularizers.l2(10**(-5)/200)))
+    model.add(Dense(units=200, activation='sigmoid', kernel_regularizer=keras.regularizers.l2(10**(-5)/200)))
+    model.add(Dense(units=num_classes, activation='softmax', kernel_regularizer=keras.regularizers.l2(10**(-6)/10)))
+    model.summary()
+    
+    #Entrainer et évaluer le réseau
+    
+    model.compile(optimizer= "SGD", loss='categorical_crossentropy', metrics=['accuracy'])
+    history = model.fit(x_train, y_train, batch_size=128, epochs=100, verbose=False, validation_split=.1)
+    loss, accuracy  = model.evaluate(x_test, y_test, verbose=False)
+    
+    plt.plot(history.history['accuracy'])
+    plt.plot(history.history['val_accuracy'])
+    plt.title('model accuracy')
+    plt.ylabel('accuracy')
+    plt.xlabel('epoch')
+    plt.legend(['training', 'validation'], loc='best')
+    plt.show()
+    
+    print(f'Test loss: {loss:.3}')
+    print(f'Test accuracy: {accuracy:.3}')
+    
+    return(model)
+    
+# #######################
+# Ca ne marche pas ca : #
+# #######################
+
+# pixel_a_tester = np.zeros((784))
+# pourcentage = []
+# image_retrouve = []
+# 
+# for i in range(784):
+#     pixel_a_tester[i] = 1
+#     pourcentage.append([model.predict_proba(np.array([pixel_a_tester]))])
+#     image_retrouve.append(model.predict_classes(np.array([pixel_a_tester])))
+#     pixel_a_tester[i] = 0
+# image_retrouve.count(image_retrouve[0])
