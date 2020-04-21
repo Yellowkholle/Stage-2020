@@ -201,11 +201,50 @@ def RNN5():
 # image_retrouve.count(image_retrouve[0])
 
 def fonction_a_minimiser_pour_trouver_un_adversaire(r,x,c,l,model):
-    prediction = model.predict_proba(np.array([x+r]))[0]
-    return(c*np.sum(np.abs(r)) - np.log(prediction[l]))
+    prediction = model.predict_proba(np.array([r]))[0]
+    return(c*np.sum(np.square(x - r)) - np.log(prediction[l]))
 
 def creation_adversaire(model,x,l):
-    c = 10**(20)
-    x0 = x_train[l] - x
-    sortie = so.fmin_l_bfgs_b(fonction_a_minimiser_pour_trouver_un_adversaire, x0, args = (x,c,l,model), approx_grad=True)
+    c = 10**(-5.8)
+    x0 = x_train[l]
+    bounds = [(0,255)]*784
+    sortie = so.fmin_l_bfgs_b(fonction_a_minimiser_pour_trouver_un_adversaire, x0, args = (x,c,l,model), approx_grad=True, bounds = bounds)
     return(sortie)
+    
+# Code de test
+
+# plt.close()
+# 
+# s = creation_adversaire(model1, x_train[0], 5)
+# t = s[0] - x_train[0]
+# u = np.reshape(t, (28,28))
+# 
+# #le changement/le filtre
+# ax = plt.subplot(1, 4, 1)
+# ax.axis('off')
+# plt.imshow(u, cmap='Greys')
+# 
+# #x0
+# ax = plt.subplot(1, 4, 2)
+# ax.axis('off')
+# plt.imshow(np.reshape(x_train[5], (28,28)), cmap='Greys')
+# 
+# #image sortie
+# ax = plt.subplot(1, 4, 3)
+# ax.axis('off')
+# plt.imshow(np.reshape(s[0], (28,28)), cmap='Greys')
+# 
+# #image entrée
+# ax = plt.subplot(1, 4, 4)
+# ax.axis('off')
+# plt.imshow(np.reshape(x_train[0], (28,28)), cmap='Greys')
+# 
+# #inutile
+# # ax = plt.subplot(1, 5, 5)
+# # ax.axis('off')
+# # ploc = [s[0][i] + x_train[0][i] for i in range(784)]
+# # plt.imshow(np.reshape(ploc, (28,28)), cmap='Greys')
+# plt.show()
+# 
+# print(model1.predict_classes(np.array([s[0]])))
+# print(model1.predict_proba(np.array([s[0]])))
