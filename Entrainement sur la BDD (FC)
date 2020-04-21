@@ -23,22 +23,28 @@ num_classes = 10
 y_train = keras.utils.to_categorical(y_train, num_classes)
 y_test = keras.utils.to_categorical(y_test, num_classes)
 
-# e,f = x_train[0], x_train[1]
-# x_train[0] = a
-# x_train[1] = c
 
 #I - Sert à voir qqs images
+#je vais me débrouiller pour avoir 0,1,2,3,4,5,6,7,8,9 dans les 10 premiers termes de la BDD :
+x_copy = x_train[0:10].copy()
+y_copy = y_train[0:10].copy()
+
+x_train[0], x_train[1], x_train[2], x_train[3], x_train[4], x_train[5], x_train[6], x_train[7], x_train[8], x_train[9], x_train[13], x_train[15], x_train[17] = x_copy[1], x_copy[3], x_copy[5], x_copy[7], x_copy[2], x_copy[0], x_train[13], x_train[15], x_train[17], x_copy[4], x_copy[6], x_copy[8], x_copy[9]
+
+y_train[0], y_train[1], y_train[2], y_train[3], y_train[4], y_train[5], y_train[6], y_train[7], y_train[8], y_train[9], y_train[13], y_train[15], y_train[17] = y_copy[1], y_copy[3], y_copy[5], y_copy[7], y_copy[2], y_copy[0], y_train[13], y_train[15], y_train[17], y_copy[4], y_copy[6], y_copy[8], y_copy[9]
 
 for i in range(64):
     ax = plt.subplot(8, 8, i+1)
     ax.axis('off')
     #plt.imshow(x_train_drawing[randint(0, x_train.shape[0])], cmap='Greys')
-    plt.imshow(x_train_drawing[randint(0, len(x_train))], cmap='Greys')
+    #plt.imshow(x_train_drawing[randint(0, len(x_train))], cmap='Greys')
     #plt.imshow(b_drawing[randint(0, 2)], cmap='Greys')
+    plt.imshow(x_train_drawing[i], cmap='Greys')
     plt.show()
 
-# x_train[0] = e
-# x_train[1] = f
+
+
+
 
 #II - Premier réseau
 
@@ -193,3 +199,13 @@ def RNN5():
 #     image_retrouve.append(model.predict_classes(np.array([pixel_a_tester])))
 #     pixel_a_tester[i] = 0
 # image_retrouve.count(image_retrouve[0])
+
+def fonction_a_minimiser_pour_trouver_un_adversaire(r,x,c,l,model):
+    prediction = model.predict_proba(np.array([x+r]))[0]
+    return(c*np.sum(np.abs(r)) - np.log(prediction[l]))
+
+def creation_adversaire(model,x,l):
+    c = 10**(20)
+    x0 = x_train[l] - x
+    sortie = so.fmin_l_bfgs_b(fonction_a_minimiser_pour_trouver_un_adversaire, x0, args = (x,c,l,model), approx_grad=True)
+    return(sortie)
